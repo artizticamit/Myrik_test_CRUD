@@ -10,6 +10,7 @@ function App() {
   const [long, setLong] = useState(""); // State for longitude
   const [title, setTitle] = useState(""); // State for image title
   const [description, setDescription] = useState(""); // State for image description
+  const [pinnedImages, setPinnedImages] = useState([]); // State for pinned images
 
   // Fetch images from the server
   const fetchImages = async () => {
@@ -69,6 +70,27 @@ function App() {
       alert("Failed to sort images by nearest. Please try again.");
     }
   };
+
+  const togglePin = async (imageId, currentPinnedStatus) => {
+    try {
+      const response = await axios.post("http://localhost:8000/api/pin", {
+        id: imageId,
+        pinned: !currentPinnedStatus,
+      });
+
+      console.log(response);
+
+      if (response.data && response.data.image) {
+        // Refresh the images to reflect the updated pin state
+        fetchImages();
+      } else {
+        alert("Unexpected response format from server.");
+      }
+    } catch (error) {
+      console.error("Error updating pin status:", error);
+      alert("Failed to update pin status. Please try again.");
+    }
+  };
   
 
   // Fetch images on component mount
@@ -122,13 +144,15 @@ function App() {
         {images.length > 0 ? (
           images.map((image, index) => (
             <Photocard
-              key={index}
+              key={image.id}
               imageUrl={`http://localhost:8000/uploads/${encodeURIComponent(image.fileName)}`} // Adjust based on server response
               title={image.title}
               description={image.description}
               latitude={image.latitude}
               longitude={image.longitude}
               uploadDate={image.uploadDate}
+              pinned={image.pinned}
+              onTogglePin={() => togglePin(image.id, image.pinned)} // Pass the pin toggle handler
             />
           ))
         ) : (

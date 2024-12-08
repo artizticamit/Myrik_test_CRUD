@@ -1,16 +1,27 @@
 [
   {
+    "id": 1,
     "fileName": "1733659436626-81507982-cat_image.png",
     "filePath": "/uploads/1733659436626-81507982-cat_image.png",
     "uploadDate": "2024-12-08T12:03:56.632Z",
     "latitude": 23,
-    "longitude": 23
+    "longitude": 23,
+    "pinned": true
   },
   {
+    "id": 2,
     "fileName": "1733660278999-285252880-1.png",
     "filePath": "/uploads/1733660278999-285252880-1.png",
     "uploadDate": "2024-12-08T12:17:59.002Z",
     "latitude": 234,
+    "longitude": 2,
+    "pinned": false
+  },
+  {
+    "fileName": "1733662064116-421770646-1.png",
+    "filePath": "/uploads/1733662064116-421770646-1.png",
+    "uploadDate": "2024-12-08T12:47:44.122Z",
+    "latitude": 300,
     "longitude": 2
   }
 ]

@@ -120,11 +120,14 @@ router.get("/getimages", (req, res) => {
 // Fetch latest uploaded images API
 router.get("/latest", (req, res) => {
     const metadata = JSON.parse(fs.readFileSync(metadataFile));
-    const sortedByDate = metadata.sort(
-      (a, b) => new Date(b.uploadDate) - new Date(a.uploadDate)
-    );
+  
+    const sortedByDate = metadata
+      .sort((a, b) => new Date(b.uploadDate) - new Date(a.uploadDate)) // Sort by upload date
+      .sort((a, b) => (b.pinned === true ? 1 : 0) - (a.pinned === true ? 1 : 0)); // Prioritize pinned images
+  
     res.json(sortedByDate);
   });
+  
 
   router.get("/nearest", (req, res) => {
     const { lat, long } = req.query;
@@ -138,12 +141,14 @@ router.get("/latest", (req, res) => {
     const sortedByProximity = metadata
       .map((image) => ({
         ...image,
-        distance: calculateDistance(lat, long, image.latitude, image.longitude)
+        distance: calculateDistance(lat, long, image.latitude, image.longitude),
       }))
-      .sort((a, b) => a.distance - b.distance);
+      .sort((a, b) => a.distance - b.distance) // Sort by proximity
+      .sort((a, b) => (b.pinned === true ? 1 : 0) - (a.pinned === true ? 1 : 0)); // Prioritize pinned images
   
     res.json(sortedByProximity);
   });
+  
 
 router.get("/getimage/:imageName", (req, res) => {
     let imageName = req.params.imageName; // Get the image name from the URL parameter
@@ -162,6 +167,26 @@ router.get("/getimage/:imageName", (req, res) => {
     } else {
       res.status(404).json({ error: "Image not found" });
     }
+  });
+
+
+  router.post("/pin", (req, res) => {
+    const { id, pinned } = req.body; // `id` is the image ID, `pinned` is the new status
+    console.log(req.body);
+    // Load metadata file
+    const metadata = JSON.parse(fs.readFileSync(metadataFile));
+  
+    // Find the image and update pinned status
+    const image = metadata.find((img) => img.id === id);
+    if (!image) {
+      return res.status(404).json({ error: "Image not found" });
+    }
+  
+    image.pinned = pinned;
+  
+    // Save updated metadata back to file
+    fs.writeFileSync(metadataFile, JSON.stringify(metadata));
+    res.json({ message: "Pinned status updated", image });
   });
 
 module.exports = router;
